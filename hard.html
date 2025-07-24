@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>اختبار ماين كرافت - مستوى صعب</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #0d0d0d;
+      color: white;
+      margin: 0; padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      background: #1e1e1e;
+      max-width: 700px;
+      width: 100%;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 0 25px #f4433688;
+    }
+    h1 {
+      color: #f44336;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .question-number {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: #f44336;
+    }
+    .question-text {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    label {
+      background: #262626;
+      padding: 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.3s, background-color 0.3s;
+    }
+    input[type="radio"] {
+      display: none;
+    }
+    input[type="radio"]:checked + label {
+      border-color: #f44336;
+      background-color: #f4433688;
+    }
+    button {
+      margin-top: 25px;
+      padding: 15px 35px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 15px;
+      background: linear-gradient(45deg, #f44336, #e53935);
+      color: #000;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    button:hover {
+      background: linear-gradient(45deg, #ef5350, #ef5350cc);
+    }
+    .result {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 1.6rem;
+      color: #f44336;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔴 اختبار مستوى صعب</h1>
+    <div class="question-number" id="question-number"></div>
+    <div class="question-text" id="question-text"></div>
+    <div class="answers" id="answers"></div>
+    <button id="next-btn" disabled>التالي</button>
+    <div class="result" id="result" style="display:none;"></div>
+  </div>
+
+  <script>
+    const questions = [
+      { q: "ما هي المواد اللازمة لصنع Beacon في ماينكرافت؟", a: ["Nether Star, Obsidian, Glass", "Diamond, Obsidian, Glass", "Gold, Iron, Glass", "Nether Star, Gold, Glass"], correct: 0 },
+      { q: "كيف تحصل على Enchanted Golden Apple (التفاح الذهبي المسحور)؟", a: ["Only found in chests (rare loot)", "Crafted with Gold and Apple", "Dropped by Zombies", "Found in Villager Trades"], correct: 0 },
+      { q: "ما هي المكونات اللازمة لصنع Eye of Ender؟", a: ["Blaze Powder and Ender Pearl", "Ender Pearl and Diamond", "Blaze Rod and Pearl", "Ender Pearl and Gold"], correct: 0 },
+      { q: "ما هي الطريقة الصحيحة لإنشاء Iron Golem؟", a: ["4 Iron Blocks + 1 Pumpkin", "3 Iron Blocks + 1 Pumpkin", "4 Iron Blocks + 1 Snowball", "5 Iron Blocks + 1 Pumpkin"], correct: 0 },
+      { q: "كم عدد أنواع الـ Potion القابلة للصنع في اللعبة؟", a: ["Over 30 types", "10 types", "20 types", "50 types"], correct: 0 },
+      { q: "ما هو اسم الوحش الذي يوجد فقط في عالم الEnd ويسبب الضرر بضربات عالية؟", a: ["Ender Dragon", "Wither", "Ghast", "Blaze"], correct: 0 },
+      { q: "ما هي خاصية Soul Sand في النذر ؟", a: ["Slows movement and allows Nether Wart growth", "Speeds up movement", "Prevents mob spawning", "Increases jump height"], correct: 0 },
+      { q: "ما هو الحد الأقصى لارتفاع الأبراج التي يمكن بناؤها بدون سقف؟", a: ["256 blocks", "128 blocks", "512 blocks", "64 blocks"], correct: 0 },
+      { q: "كيف تصنع Enchantment Table؟", a: ["4 Obsidian, 2 Diamonds, 1 Book", "3 Obsidian, 2 Diamonds, 1 Book", "4 Obsidian, 1 Diamond, 1 Book", "5 Obsidian, 2 Diamonds, 1 Book"], correct: 0 },
+      { q: "ما هي تأثيرات Potion of Swiftness؟", a: ["Increases movement speed", "Increases jump height", "Gives strength", "Heals health"], correct: 0 },
+      { q: "ما هي المدة التي تبقى فيها Ender Pearls صالحة قبل أن تختفي؟", a: ["16 seconds", "10 seconds", "20 seconds", "30 seconds"], correct: 0 },
+      { q: "ما هو تأثير Wither Effect؟", a: ["Damages health over time and prevents healing", "Increases health", "Gives speed boost", "Prevents damage"], correct: 0 },
+      { q: "ما هو أفضل البلوكات لبناء قاعدة مقاومة للانفجارات؟", a: ["Obsidian and End Stone", "Stone and Wood", "Iron and Gold", "Sand and Gravel"], correct: 0 },
+      { q: "كيف يمكن ترويض Parrot؟", a: ["Feed Seeds (any)", "Feed Apples", "Throw Fish", "Use Lead"], correct: 0 },
+      { q: "ما هو عدد القطع المطلوبة لصنع Beacon Pyramid كاملة؟", a: ["164 blocks minimum", "100 blocks", "200 blocks", "150 blocks"], correct: 0 },
+      { q: "ما هو البلوك الذي يسمح بعبور الأشعة (Light) ولكنه يمنع المرور؟", a: ["Stained Glass", "Glass", "Iron Bars", "Fence"], correct: 0 },
+      { q: "ما هي طريقة زراعة Cocoa Beans؟", a: ["على جذوع الأشجار في الغابة", "على الأرض", "على الماء", "داخل الكهوف"], correct: 0 },
+      { q: "كيف تصنع Trapdoor خشبي؟", a: ["6 Wooden Planks", "4 Wooden Planks", "3 Wooden Planks", "5 Wooden Planks"], correct: 0 },
+      { q: "ما هو الحد الأقصى للعدد المسموح به من TNT في انفجار واحد دون تأخير؟", a: ["Depends on server performance, no fixed limit", "10 TNT", "50 TNT", "100 TNT"], correct: 0 },
+      { q: "ما هي الطريقة الوحيدة لإلغاء تأثير Levitation؟", a: ["الانتظار حتى ينتهي أو استخدام الدروع الخاصة (No official cure)", "تناول التفاح الذهبي", "الهبوط على الماء", "استخدام السلم"], correct: 0 }
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+
+    const questionNumberElem = document.getElementById('question-number');
+    const questionTextElem = document.getElementById('question-text');
+    const answersElem = document.getElementById('answers');
+    const nextBtn = document.getElementById('next-btn');
+    const resultElem = document.getElementById('result');
+
+    function loadQuestion() {
+      nextBtn.disabled = true;
+      const currentQ = questions[currentIndex];
+      questionNumberElem.textContent = `السؤال ${currentIndex + 1} من ${questions.length}`;
+      questionTextElem.textContent = currentQ.q;
+      answersElem.innerHTML = '';
+      currentQ.a.forEach((answer, idx) => {
+        const id = `answer${idx}`;
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'answer';
+        radio.id = id;
+        radio.value = idx;
+        radio.addEventListener('change', () => {
+          nextBtn.disabled = false;
+        });
+        const label = document.createElement('label');
+        label.htmlFor = id;
+        label.textContent = answer;
+        answersElem.appendChild(radio);
+        answersElem.appendChild(label);
+      });
+    }
+
+    nextBtn.addEventListener('click', () => {
+      const selected = document.querySelector('input[name="answer"]:checked');
+      if (!selected) return;
+
+      if (parseInt(selected.value) === questions[currentIndex].correct) {
+        score++;
+      }
+
+      currentIndex++;
+      if (currentIndex < questions.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    });
+
+    function showResult() {
+      questionNumberElem.style.display = 'none';
+      questionTextElem.style.display = 'none';
+      answersElem.style.display = 'none';
+      nextBtn.style.display = 'none';
+
+      resultElem.style.display = 'block';
+      resultElem.textContent = `انتهى الاختبار! نتيجتك: ${score} من ${questions.length}`;
+      // زر العودة للرئيسية
+      const btn = document.createElement('button');
+      btn.textContent = 'العودة للرئيسية';
+      btn.style.marginTop = '20px';
+      btn.style.padding = '12px 25px';
+      btn.style.fontSize = '1.1rem';
+      btn.style.border = 'none';
+      btn.style.borderRadius = '10px';
+      btn.style.cursor = 'pointer';
+      btn.style.background = 'linear-gradient(45deg, #f44336, #e53935)';
+      btn.onclick = () => {
+        window.location.href = 'index.html'; // عدل الرابط حسب موقع الصفحة الرئيسية عندك
+      };
+      resultElem.appendChild(document.createElement('br'));
+      resultElem.appendChild(btn);
+    }
+
+    loadQuestion();
+  </script>
+   <!-- شريط الحقوق -->
+  <footer style="margin-top: 40px; text-align: center; font-size: 0.9rem; color: #888;">
+    <div style="margin-bottom: 5px;">© ماكس - 
+      <a href="https://t.me/minecraftsVersions" style="color: #ff5722; text-decoration: none;">
+        @minecraftsVersions
+      
+
+  <footer style="
+  position: fixed; 
+  bottom: 0; 
+  width: 100%; 
+  background-color: #1a1a1a; 
+  color: #ff6600; /* برتقالي للنص */
+  text-align: center; 
+  padding: 12px 0; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+  font-size: 15px; 
+  z-index: 1000;
+">
+  حقوق ماكس - 
+  <a href="https://t.me/minecraftsVersions" target="_blank" rel="noopener" style="color: #39b54a; text-decoration: none;">@minecraftsVersions</a><br>
+  تم صناعة الموقع بالكامل بواسطة  
+  <a href="https://t.me/T_90q" target="_blank" rel="noopener" style="color: #39b54a; text-decoration: none;">@T_90q</a>
+</footer>
+
+</body>
+</html>
+
