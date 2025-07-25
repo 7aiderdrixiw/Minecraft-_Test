@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>اختبار ماين كرافت - مستوى مستحيل</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #0d0d0d;
+      color: white;
+      margin: 0; padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      background: #1e1e1e;
+      max-width: 700px;
+      width: 100%;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 0 25px #ff572288;
+    }
+    h1 {
+      color: #ff5722;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .question-number {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: #ff5722;
+    }
+    .question-text {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    label {
+      background: #262626;
+      padding: 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.3s, background-color 0.3s;
+    }
+    input[type="radio"] {
+      display: none;
+    }
+    input[type="radio"]:checked + label {
+      border-color: #ff5722;
+      background-color: #ff572288;
+    }
+    button {
+      margin-top: 25px;
+      padding: 15px 35px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 15px;
+      background: linear-gradient(45deg, #ff5722, #e64a19);
+      color: #000;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    button:hover {
+      background: linear-gradient(45deg, #ff7043, #ff7043cc);
+    }
+    .result {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 1.6rem;
+      color: #ff5722;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔥 اختبار مستوى مستحيل</h1>
+    <div class="question-number" id="question-number"></div>
+    <div class="question-text" id="question-text"></div>
+    <div class="answers" id="answers"></div>
+    <button id="next-btn" disabled>التالي</button>
+    <div class="result" id="result" style="display:none;"></div>
+  </div>
+
+ <script>
+  const questions = [
+    { q: "ما اسم البلوك الذي لا يمكن الحصول عليه في الوضع البسيط؟", a: ["End Portal", "Bedrock", "Barrier", "Obsidian"], correct: 2 },
+    { q: "ما هو نوع الوحش الوحيد الذي لا يمكن قتله في الوضع الطبيعي؟", a: ["Creeper", "Wither", "Ghast", "EnderDragon"], correct: 3 },
+    { q: "ما اسم المادة التي تستخدم في صنع أغلى أدوات اللعبة؟", a: ["Netherite", "Gold", "Iron", "Diamond"], correct: 0 },
+    { q: "ما هو المكون الأساسي لصنع Eye of Ender؟", a: ["EnderPearl", "Obsidian", "Diamond", "Blaze Powder"], correct: 0 },
+    { q: "ما اسم الوحش الذي يظهر فقط في Nether ويحترق في النهار؟", a: ["Magma Cube", "Blaze", "Ghast", "Piglin"], correct: 1 },
+    { q: "ما اسم البلوك الذي يستخدم لإعادة تدوير الإشارات؟", a: ["Comparator", "Observer", "Repeater", "Daylight Sensor"], correct: 1 },
+    { q: "ما هو اسم البلوكات التي تصدر الضوء تحت الماء؟", a: ["Lava", "Glowstone", "Torch", "SeaLantern"], correct: 3 },
+    { q: "ما اسم الحيوان السليم الوحيد الذي يطير في اللعبة؟", a: ["Parrot", "Bat", "Chicken", "Phantom"], correct: 0 },
+    { q: "ما اسم الأداة التي تسمح بجمع البلوكات دون تدميرها؟", a: ["Efficiency", "SilkTouch", "Fortune", "Unbreaking"], correct: 1 },
+    { q: "ما اسم المادة التي تستخدم لصنع TNT؟", a: ["Gunpowder", "Coal", "Iron", "Sand"], correct: 0 },
+    { q: "ما هو اسم الوحش الذي يهاجم فقط في الليل؟", a: ["Creeper", "Zombie", "Spider", "Skeleton"], correct: 1 },
+    { q: "ما اسم البلوك الذي يسمح بعبور الضوء لكنه صلب؟", a: ["Torch", "Iron Bars", "Fence", "Glass"], correct: 3 },
+    { q: "ما اسم الحيوان الذي يطير ويصدر أصوات موسيقية؟", a: ["Ocelot", "Bat", "Parrot", "Phantom"], correct: 2 },
+    { q: "ما اسم البلوك الذي يستخدم لصنع الفراش؟", a: ["Wood Planks", "Wool", "Stone", "Iron"], correct: 1 },
+    { q: "ما اسم الوحش الذي يقفز ويهاجم بسرعة؟", a: ["Spider", "Creeper", "Zombie", "Skeleton"], correct: 0 }
+  ];
+
+
+
+    let currentIndex = 0;
+    let score = 0;
+
+    const questionNumberElem = document.getElementById('question-number');
+    const questionTextElem = document.getElementById('question-text');
+    const answersElem = document.getElementById('answers');
+    const nextBtn = document.getElementById('next-btn');
+    const resultElem = document.getElementById('result');
+
+    function loadQuestion() {
+      nextBtn.disabled = true;
+      const currentQ = questions[currentIndex];
+      questionNumberElem.textContent = `السؤال ${currentIndex + 1} من ${questions.length}`;
+      questionTextElem.textContent = currentQ.q;
+      answersElem.innerHTML = '';
+      currentQ.a.forEach((answer, idx) => {
+        const id = `answer${idx}`;
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'answer';
+        radio.id = id;
+        radio.value = idx;
+        radio.addEventListener('change', () => {
+          nextBtn.disabled = false;
+        });
+        const label = document.createElement('label');
+        label.htmlFor = id;
+        label.textContent = answer;
+        answersElem.appendChild(radio);
+        answersElem.appendChild(label);
+      });
+    }
+
+    nextBtn.addEventListener('click', () => {
+      const selected = document.querySelector('input[name="answer"]:checked');
+      if (!selected) return;
+
+      if (parseInt(selected.value) === questions[currentIndex].correct) {
+        score++;
+      }
+
+      currentIndex++;
+      if (currentIndex < questions.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    });
+
+    function showResult() {
+      questionNumberElem.style.display = 'none';
+      questionTextElem.style.display = 'none';
+      answersElem.style.display = 'none';
+      nextBtn.style.display = 'none';
+
+      resultElem.style.display = 'block';
+      resultElem.textContent = `انتهى الاختبار! نتيجتك: ${score} من ${questions.length}`;
+      const btn = document.createElement('button');
+      btn.textContent = 'العودة للرئيسية';
+      btn.style.marginTop = '20px';
+      btn.style.padding = '12px 25px';
+      btn.style.fontSize = '1.1rem';
+      btn.style.border = 'none';
+      btn.style.borderRadius = '10px';
+      btn.style.cursor = 'pointer';
+      btn.style.background = 'linear-gradient(45deg, #ff5722, #e64a19)';
+      btn.onclick = () => {
+        window.location.href = 'index1.html'; // عدل الرابط حسب مكان الصفحة الرئيسية
+      };
+      resultElem.appendChild(document.createElement('br'));
+      resultElem.appendChild(btn);
+    }
+
+    loadQuestion();
+
+  </script>
+
+  <!-- شريط الحقوق -->
+  <footer style="margin-top: 40px; text-align: center; font-size: 0.9rem; color: #888;">
+    <div style="margin-bottom: 5px;">© ماكس - 
+      <a href="https://t.me/minecraftsVersions" style="color: #ff5722; text-decoration: none;">
+        @minecraftsVersions
+      
+  <footer style="
+  position: fixed; 
+  bottom: 0; 
+  left: 0;
+  right: 0;
+  background-color: #1a1a1a; 
+  color: #ff6600; 
+  text-align: center; 
+  padding: 12px 0; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+  font-size: 15px; 
+  z-index: 1000;
+">
+  حقوق ماكس - 
+  <a href="https://t.me/minecraftsVersions" target="_blank" rel="noopener" style="color: #39b54a; text-decoration: none;">@minecraftsVersions</a><br>
+  تم صناعة الموقع بالكامل بواسطة  
+  <a href="https://t.me/T_90q" target="_blank" rel="noopener" style="color: #39b54a; text-decoration: none;">@T_90q</a>
+</footer>
